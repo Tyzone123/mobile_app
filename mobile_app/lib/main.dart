@@ -62,7 +62,34 @@ class _MainPageState extends State<MainPage> {
 
       body: _pages[_selectedIndex],
 
-      
+      drawer: Drawer(
+        child: Column(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.deepPurple,
+              ),
+              child: const Text('Menu', style: TextStyle(color: Color.fromARGB(255, 14, 13, 13), fontSize: 24)),
+            ),
+            const ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Home'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.message),
+              title: Text('Messages'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.person),
+              title: Text('Profile'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+            ),
+          ],
+        ),
+      ),
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
