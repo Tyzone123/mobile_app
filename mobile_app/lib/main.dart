@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'Pages/home_page.dart';
 import 'Pages/message_Page.dart';
 import 'Pages/profile_page.dart';
 import 'Pages/setting_page.dart';
-import 'Pages/detail_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,15 +35,14 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
-  // Pages List
+  // Pages List with ValueKeys for the AnimatedSwitcher
   final List<Widget> _pages = [
-     HomePage(),
-    const Message(),
-    const Profile(),
-    const Setting(),
+    const HomePage(key: ValueKey(0)),
+    const Message(key: ValueKey(1)),
+    const Profile(key: ValueKey(2)),
+    const Setting(key: ValueKey(3)),
   ];
 
-  // Titles List
   final List<String> _titles = [
     'Home',
     'Messages',
@@ -53,7 +50,6 @@ class _MainPageState extends State<MainPage> {
     'Settings',
   ];
 
-  // Centralized function to change pages
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -66,74 +62,60 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: Text(_titles[_selectedIndex]),
         backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white, // Makes text/icon white
+        foregroundColor: Colors.white,
       ),
-      
-      // The content of the app
-      body: _pages[_selectedIndex],
 
-      // Side Navigation Menu
+      // 1. SIDE NAVIGATION MENU (RESTORED)
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.deepPurple,
+              decoration: BoxDecoration(color: Colors.deepPurple),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CircleAvatar(radius: 30, backgroundColor: Colors.white, child: Icon(Icons.person, color: Colors.deepPurple)),
+                  SizedBox(height: 10),
+                  Text('Thomas Anthony', style: TextStyle(color: Colors.white, fontSize: 20)),
+                ],
               ),
-              child: Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              selected: _selectedIndex == 0,
-              onTap: () {
-                _onItemTapped(0);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.message),
-              title: const Text('Messages'),
-              selected: _selectedIndex == 1,
-              onTap: () {
-                _onItemTapped(1);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profile'),
-              selected: _selectedIndex == 2,
-              onTap: () {
-                _onItemTapped(2);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              selected: _selectedIndex == 3,
-              onTap: () {
-                _onItemTapped(3);
-                Navigator.pop(context);
-              },
-            ),
+            _buildDrawerTile(0, Icons.home, 'Home'),
+            _buildDrawerTile(1, Icons.message, 'Messages'),
+            _buildDrawerTile(2, Icons.person, 'Profile'),
+            _buildDrawerTile(3, Icons.settings, 'Settings'),
           ],
         ),
       ),
 
-      // Bottom Navigation Bar
+      // 2. ANIMATED BODY (Smooth transition between pages)
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.1, 0), // Slight slide from right
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            ),
+          );
+        },
+        child: _pages[_selectedIndex],
+      ),
+
+      // 3. BOTTOM NAVIGATION BAR
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, 
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white, 
+        backgroundColor: Colors.white,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
@@ -141,6 +123,19 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),
+    );
+  }
+
+  // Helper to build Drawer Tiles and handle navigation + closing drawer
+  Widget _buildDrawerTile(int index, IconData icon, String title) {
+    return ListTile(
+      leading: Icon(icon, color: _selectedIndex == index ? Colors.deepPurple : Colors.grey),
+      title: Text(title, style: TextStyle(color: _selectedIndex == index ? Colors.deepPurple : Colors.black)),
+      selected: _selectedIndex == index,
+      onTap: () {
+        _onItemTapped(index);
+        Navigator.pop(context); // Closes the drawer
+      },
     );
   }
 }
