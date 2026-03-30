@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mobile App',
+      title: 'Mobile App Bandoy',
       home: const MainPage(),
     );
   }
@@ -63,38 +63,63 @@ class _MainPageState extends State<MainPage> {
       body: _pages[_selectedIndex],
 
       drawer: Drawer(
-        child: Column(
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                color: Colors.deepPurple,
-              ),
-              child: const Text('Menu', style: TextStyle(color: Color.fromARGB(255, 14, 13, 13), fontSize: 24)),
-            ),
-            const ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.message),
-              title: Text('Messages'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-            ),
-          ],
-        ),
+  child: Column(
+    children: [
+      Container(
+        decoration: const BoxDecoration(),
+        child: const Text('Menu', style: TextStyle(fontSize: 24)),
       ),
+      ListTile(
+        leading: const Icon(Icons.home),
+        title: const Text('Home'),
+        onTap: () {
+          setState(() {
+            _selectedIndex = 0;
+          });
+          Navigator.pop(context); // close drawer
+        },
+      ),
+      ListTile(
+        leading: const Icon(Icons.message),
+        title: const Text('Messages'),
+        onTap: () {
+          setState(() {
+            _selectedIndex = 1;
+          });
+          Navigator.pop(context);
+        },
+      ),
+      ListTile(
+        leading: const Icon(Icons.person),
+        title: const Text('Profile'),
+        onTap: () {
+          setState(() {
+            _selectedIndex = 2;
+          });
+          Navigator.pop(context);
+        },
+      ),
+      ListTile(
+        leading: const Icon(Icons.settings),
+        title: const Text('Settings'),
+        onTap: () {
+          setState(() {
+            _selectedIndex = 3;
+          });
+          Navigator.pop(context);
+        },
+      ),
+    ],
+  ),
+),
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: const Color.fromARGB(255, 69, 8, 173),
+        backgroundColor: Colors.yellow,
+
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
