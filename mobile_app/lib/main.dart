@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'Pages/HomePage.dart';
-import 'Pages/Message.dart';
-import 'Pages/Profile.dart';
-import 'Pages/Setting.dart';
+import 'Pages/home_page.dart';
+import 'Pages/message_Page.dart';
+import 'Pages/profile_page.dart';
+import 'Pages/setting_page.dart';
+import 'Pages/detail_page.dart';
 
 void main() {
   runApp(const MyApp());
