@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'Pages/HomePage.dart';
 import 'Pages/Message.dart';
 import 'Pages/Profile.dart';
@@ -16,6 +17,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Mobile App Bandoy',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        useMaterial3: true,
+      ),
       home: const MainPage(),
     );
   }
@@ -31,13 +36,15 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
+  // Pages List
   final List<Widget> _pages = [
-    HomePage(),
-    Message(),
-    Profile(),
-    Setting(),
+     HomePage(),
+    const Message(),
+    const Profile(),
+    const Setting(),
   ];
 
+  // Titles List
   final List<String> _titles = [
     'Home',
     'Messages',
@@ -45,6 +52,7 @@ class _MainPageState extends State<MainPage> {
     'Settings',
   ];
 
+  // Centralized function to change pages
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -54,72 +62,77 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         title: Text(_titles[_selectedIndex]),
         backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white, // Makes text/icon white
       ),
-
+      
+      // The content of the app
       body: _pages[_selectedIndex],
 
+      // Side Navigation Menu
       drawer: Drawer(
-  child: Column(
-    children: [
-      Container(
-        decoration: const BoxDecoration(),
-        child: const Text('Menu', style: TextStyle(fontSize: 24)),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.deepPurple,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              selected: _selectedIndex == 0,
+              onTap: () {
+                _onItemTapped(0);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.message),
+              title: const Text('Messages'),
+              selected: _selectedIndex == 1,
+              onTap: () {
+                _onItemTapped(1);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
+              selected: _selectedIndex == 2,
+              onTap: () {
+                _onItemTapped(2);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              selected: _selectedIndex == 3,
+              onTap: () {
+                _onItemTapped(3);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
-      ListTile(
-        leading: const Icon(Icons.home),
-        title: const Text('Home'),
-        onTap: () {
-          setState(() {
-            _selectedIndex = 0;
-          });
-          Navigator.pop(context); // close drawer
-        },
-      ),
-      ListTile(
-        leading: const Icon(Icons.message),
-        title: const Text('Messages'),
-        onTap: () {
-          setState(() {
-            _selectedIndex = 1;
-          });
-          Navigator.pop(context);
-        },
-      ),
-      ListTile(
-        leading: const Icon(Icons.person),
-        title: const Text('Profile'),
-        onTap: () {
-          setState(() {
-            _selectedIndex = 2;
-          });
-          Navigator.pop(context);
-        },
-      ),
-      ListTile(
-        leading: const Icon(Icons.settings),
-        title: const Text('Settings'),
-        onTap: () {
-          setState(() {
-            _selectedIndex = 3;
-          });
-          Navigator.pop(context);
-        },
-      ),
-    ],
-  ),
-),
 
+      // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, 
         selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: const Color.fromARGB(255, 69, 8, 173),
-        backgroundColor: Colors.yellow,
-
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white, 
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
