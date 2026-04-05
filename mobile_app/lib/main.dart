@@ -1,58 +1,54 @@
 import 'package:flutter/material.dart';
-import 'Pages/home_page.dart';
-import 'Pages/message_Page.dart';
-import 'Pages/profile_page.dart';
-import 'Pages/setting_page.dart';
+import 'home_page.dart';
+import 'message_page.dart';
+import 'profile_page.dart';
+import 'setting_page.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MobileApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MobileApp extends StatelessWidget {
+  const MobileApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mobile App Bandoy',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         useMaterial3: true,
       ),
-      home: const MainPage(),
+      home: const MainNavigation(),
     );
   }
 }
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+class MainNavigation extends StatefulWidget {
+  const MainNavigation({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<MainNavigation> createState() => _MainNavigationState();
 }
 
-class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 0;
+class _MainNavigationState extends State<MainNavigation> {
+  // We use this integer to track which page is currently showing
+  int _currentIndex = 0;
 
-  // Pages List with ValueKeys for the AnimatedSwitcher
-  final List<Widget> _pages = [
+  // List of Page Titles for the AppBar
+  final List<String> _titles = ["Home Feed", "Messages", "Profile", "Settings"];
+
+  // [WHITEBOARD CONCEPT: ANIMATE A PAGE FOR ROUTE TRANSITION]
+  // We use ValueKeys so the AnimatedSwitcher knows when a "New" page enters.
+  final List<Widget> _screens = [
     const HomePage(key: ValueKey(0)),
-    const Message(key: ValueKey(1)),
-    const Profile(key: ValueKey(2)),
+    const MessagePage(key: ValueKey(1)),
+    const ProfilePage(key: ValueKey(2)),
     const Setting(key: ValueKey(3)),
   ];
 
-  final List<String> _titles = [
-    'Home',
-    'Messages',
-    'Profile',
-    'Settings',
-  ];
-
-  void _onItemTapped(int index) {
+  // Helper method to change the page and refresh the UI
+  void _onNavigate(int index) {
     setState(() {
-      _selectedIndex = index;
+      _currentIndex = index;
     });
   }
 
@@ -60,28 +56,33 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_selectedIndex]),
+        title: Text(_titles[_currentIndex], style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white), // Makes drawer icon white
       ),
 
-      // 1. SIDE NAVIGATION MENU (RESTORED)
+      // ---------------------------------------------------------
+      // 1. THE SIDE DRAWER (RESTORED)
+      // ---------------------------------------------------------
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
+            // Header with Profile Info
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.deepPurple),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircleAvatar(radius: 30, backgroundColor: Colors.white, child: Icon(Icons.person, color: Colors.deepPurple)),
                   SizedBox(height: 10),
-                  Text('Thomas Anthony', style: TextStyle(color: Colors.white, fontSize: 20)),
+                  Text('Thomas Anthony', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('thomas.dev@email.com', style: TextStyle(color: Colors.white70, fontSize: 12)),
                 ],
               ),
             ),
+            // Navigation Tiles inside the Drawer
             _buildDrawerTile(0, Icons.home, 'Home'),
             _buildDrawerTile(1, Icons.message, 'Messages'),
             _buildDrawerTile(2, Icons.person, 'Profile'),
@@ -90,52 +91,49 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
 
-      // 2. ANIMATED BODY (Smooth transition between pages)
+      // ---------------------------------------------------------
+      // 2. ANIMATED BODY (Concept: Route Transition)
+      // ---------------------------------------------------------
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.1, 0), // Slight slide from right
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            ),
-          );
-        },
-        child: _pages[_selectedIndex],
+        // This transition causes the pages to "Fade In" smoothly
+        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+        child: _screens[_currentIndex],
       ),
 
+      // ---------------------------------------------------------
       // 3. BOTTOM NAVIGATION BAR
+      // ---------------------------------------------------------
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: _currentIndex,
+        onTap: _onNavigate, // Calls the navigation helper
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: "Chat"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "User"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Setup"),
         ],
       ),
     );
   }
 
-  // Helper to build Drawer Tiles and handle navigation + closing drawer
+  // --- DRAWER HELPER METHOD ---
+  // This helps clean up the code and makes it "Understandable"
   Widget _buildDrawerTile(int index, IconData icon, String title) {
+    bool isSelected = _currentIndex == index;
     return ListTile(
-      leading: Icon(icon, color: _selectedIndex == index ? Colors.deepPurple : Colors.grey),
-      title: Text(title, style: TextStyle(color: _selectedIndex == index ? Colors.deepPurple : Colors.black)),
-      selected: _selectedIndex == index,
+      leading: Icon(icon, color: isSelected ? Colors.orange : Colors.grey),
+      title: Text(title, style: TextStyle(color: isSelected ? Colors.deepPurple : Colors.black, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+      selected: isSelected,
       onTap: () {
-        _onItemTapped(index);
-        Navigator.pop(context); // Closes the drawer
+        _onNavigate(index); // Update the page index
+        Navigator.pop(context); // [IMPORTANT] Closes the drawer after clicking
       },
     );
   }
 }
+
+
